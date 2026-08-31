@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { RecordsService } from './records.service';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
+import { Roles } from '../core/decorators/roles.decorator';
 
 @Controller('records')
+@Roles('admin', 'super_admin', 'investigator', 'staff')
 export class RecordsController {
   constructor(private readonly recordsService: RecordsService) {}
 

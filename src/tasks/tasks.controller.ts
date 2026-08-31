@@ -1,34 +1,50 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TasksService } from './tasks.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { CurrentUser } from '../core/decorators/current-user.decorator';
+import { Roles } from '../core/decorators/roles.decorator';
+import { VerifiedIdentity } from '../identity/supabase-identity.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { TasksService } from './tasks.service';
 
 @Controller('tasks')
+@Roles('admin', 'super_admin', 'investigator', 'staff', 'client')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
-
-  @Post()
-  create(@Body() createTaskDto: CreateTaskDto) {
-    return this.tasksService.create(createTaskDto);
+  @Post() create(
+    @Body() dto: CreateTaskDto,
+    @CurrentUser() identity: VerifiedIdentity,
+  ) {
+    return this.tasksService.create(dto, identity);
   }
-
-  @Get()
-  findAll() {
-    return this.tasksService.findAll();
+  @Get() findAll(@CurrentUser() identity: VerifiedIdentity) {
+    return this.tasksService.findAll(identity);
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tasksService.findOne(+id);
+  @Get(':id') findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() identity: VerifiedIdentity,
+  ) {
+    return this.tasksService.findOne(id, identity);
   }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.tasksService.update(+id, updateTaskDto);
+  @Patch(':id') update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateTaskDto,
+    @CurrentUser() identity: VerifiedIdentity,
+  ) {
+    return this.tasksService.update(id, dto, identity);
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tasksService.remove(+id);
+  @Delete(':id') remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() identity: VerifiedIdentity,
+  ) {
+    return this.tasksService.remove(id, identity);
   }
 }

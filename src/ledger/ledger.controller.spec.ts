@@ -1,17 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { LedgerController } from './ledger.controller';
 import { LedgerService } from './ledger.service';
 
 describe('LedgerController', () => {
   let controller: LedgerController;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [LedgerController],
-      providers: [LedgerService],
-    }).compile();
-
-    controller = module.get<LedgerController>(LedgerController);
+  beforeEach(() => {
+    controller = new LedgerController({} as LedgerService);
   });
 
   it('should be defined', () => {

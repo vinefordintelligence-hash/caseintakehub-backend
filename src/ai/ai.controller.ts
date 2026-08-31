@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AiService } from './ai.service';
 import { CreateAiDto } from './dto/create-ai.dto';
 import { UpdateAiDto } from './dto/update-ai.dto';
+import { Roles } from '../core/decorators/roles.decorator';
 
 @Controller('ai')
+@Roles('admin', 'super_admin')
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 

@@ -1,34 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { CurrentUser } from '../core/decorators/current-user.decorator';
+import { Roles } from '../core/decorators/roles.decorator';
+import { VerifiedIdentity } from '../identity/supabase-identity.service';
 import { LedgerService } from './ledger.service';
-import { CreateLedgerDto } from './dto/create-ledger.dto';
-import { UpdateLedgerDto } from './dto/update-ledger.dto';
-
 @Controller('ledger')
+@Roles('admin', 'super_admin', 'financial_analyst')
 export class LedgerController {
-  constructor(private readonly ledgerService: LedgerService) {}
-
-  @Post()
-  create(@Body() createLedgerDto: CreateLedgerDto) {
-    return this.ledgerService.create(createLedgerDto);
+  constructor(private readonly service: LedgerService) {}
+  @Get() findAll(@CurrentUser() i: VerifiedIdentity) {
+    return this.service.findAll(i);
   }
-
-  @Get()
-  findAll() {
-    return this.ledgerService.findAll();
+  @Get(':id') findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() i: VerifiedIdentity,
+  ) {
+    return this.service.findOne(id, i);
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ledgerService.findOne(+id);
+  @Post() create() {
+    return this.service.create();
   }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLedgerDto: UpdateLedgerDto) {
-    return this.ledgerService.update(+id, updateLedgerDto);
+  @Patch(':id') update() {
+    return this.service.update();
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ledgerService.remove(+id);
+  @Delete(':id') remove() {
+    return this.service.remove();
   }
 }

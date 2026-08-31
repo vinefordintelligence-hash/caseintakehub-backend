@@ -1,34 +1,31 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import { CurrentUser } from '../core/decorators/current-user.decorator';
+import { Permissions } from '../core/decorators/permissions.decorator';
+import { Roles } from '../core/decorators/roles.decorator';
+import { VerifiedIdentity } from '../identity/supabase-identity.service';
 import { AnalyticsService } from './analytics.service';
-import { CreateAnalyticsDto } from './dto/create-analytics.dto';
-import { UpdateAnalyticsDto } from './dto/update-analytics.dto';
 
 @Controller('analytics')
+@Roles('admin', 'super_admin', 'investigator', 'financial_analyst', 'staff')
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
-  @Post()
-  create(@Body() createAnalyticsDto: CreateAnalyticsDto) {
-    return this.analyticsService.create(createAnalyticsDto);
-  }
-
   @Get()
-  findAll() {
-    return this.analyticsService.findAll();
+  @Permissions('reports.read')
+  overview(@CurrentUser() identity: VerifiedIdentity) {
+    return this.analyticsService.overview(identity);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.analyticsService.findOne(+id);
+  @Post() @Permissions('reports.generate') create() {
+    return this.analyticsService.create();
   }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAnalyticsDto: UpdateAnalyticsDto) {
-    return this.analyticsService.update(+id, updateAnalyticsDto);
+  @Get(':id') @Permissions('reports.read') findOne() {
+    return this.analyticsService.findOne();
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.analyticsService.remove(+id);
+  @Patch(':id') @Permissions('reports.generate') update() {
+    return this.analyticsService.update();
+  }
+  @Delete(':id') @Permissions('reports.generate') remove() {
+    return this.analyticsService.remove();
   }
 }

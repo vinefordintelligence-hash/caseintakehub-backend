@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { IntegrationsService } from './integrations.service';
 import { CreateIntegrationDto } from './dto/create-integration.dto';
 import { UpdateIntegrationDto } from './dto/update-integration.dto';
+import { Roles } from '../core/decorators/roles.decorator';
 
 @Controller('integrations')
+@Roles('super_admin')
 export class IntegrationsController {
   constructor(private readonly integrationsService: IntegrationsService) {}
 
@@ -23,7 +33,10 @@ export class IntegrationsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateIntegrationDto: UpdateIntegrationDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateIntegrationDto: UpdateIntegrationDto,
+  ) {
     return this.integrationsService.update(+id, updateIntegrationDto);
   }
 

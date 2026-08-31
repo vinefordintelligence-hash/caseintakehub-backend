@@ -37,6 +37,7 @@ lerna-debug.log*
 
 # dotenv environment variable files
 .env
+.env.production
 .env.development.local
 .env.test.local
 .env.production.local
@@ -45,6 +46,18 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+# Local backups, generated inventories, and production-private uploads
+/backups/
+/private/
+*.bak-*
+*.backup
+*.save
+/files.txt
+/tsc-config.json
+
+# Production-specific recovery data (never publish)
+/src/database/migrations/0009-recover-case-history.sql
 
 # Runtime data
 pids

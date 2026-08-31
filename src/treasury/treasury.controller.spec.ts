@@ -1,20 +1,24 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { FEATURE_POLICY } from '../funding/funding-feature.guard';
 import { TreasuryController } from './treasury.controller';
-import { TreasuryService } from './treasury.service';
-
-describe('TreasuryController', () => {
-  let controller: TreasuryController;
-
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [TreasuryController],
-      providers: [TreasuryService],
-    }).compile();
-
-    controller = module.get<TreasuryController>(TreasuryController);
-  });
-
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+describe('TreasuryController authorization boundary', () => {
+  it('gates every real deposit and withdrawal capability on wallet connections', () => {
+    for (const method of [
+      'overview',
+      'assign',
+      'addresses',
+      'deposits',
+      'verify',
+      'scan',
+      'requestWithdrawal',
+      'withdrawals',
+      'approve',
+      'execute',
+    ])
+      expect(
+        Reflect.getMetadata(
+          FEATURE_POLICY,
+          TreasuryController.prototype[method as keyof TreasuryController],
+        ),
+      ).toEqual(['walletConnectionsEnabled']);
   });
 });

@@ -1,18 +1,23 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { ForbiddenException } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 
 describe('AnalyticsService', () => {
-  let service: AnalyticsService;
-
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [AnalyticsService],
-    }).compile();
-
-    service = module.get<AnalyticsService>(AnalyticsService);
+  it('uses only the verified organization in every aggregate', async () => {
+    const data = { query: jest.fn().mockResolvedValue([{ value: [] }]) } as any;
+    const service = new AnalyticsService(data);
+    await service.overview({
+      actorId: 'actor',
+      organizationId: 'org',
+      role: 'admin',
+    } as any);
+    expect(data.query).toHaveBeenCalledTimes(4);
+    for (const call of data.query.mock.calls) expect(call[1]).toEqual(['org']);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  it('rejects client analytics access', async () => {
+    const service = new AnalyticsService({ query: jest.fn() } as any);
+    await expect(
+      service.overview({ organizationId: 'org', role: 'client' } as any),
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 });

@@ -1,26 +1,73 @@
-import { Injectable } from '@nestjs/common';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { VerifiedIdentity } from '../identity/supabase-identity.service';
+import { VINEFORD_USER_ROLES } from '../identity/supabase-identity.service';
+
+const ROLES = VINEFORD_USER_ROLES;
+
+type RoleName = (typeof ROLES)[number];
 
 @Injectable()
 export class RolesService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
+  create(_: unknown, identity: VerifiedIdentity) {
+    this.superAdmin(identity);
+    throw new ForbiddenException(
+      'custom role creation is disabled; Vineford uses protected system roles',
+    );
   }
 
-  findAll() {
-    return `This action returns all roles`;
+  findAll(identity: VerifiedIdentity) {
+    this.admin(identity);
+
+    return ROLES.map((name) => ({
+      id: name,
+      name,
+      system: true,
+      mutable: false,
+    }));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
+  findOne(id: string, identity: VerifiedIdentity) {
+    this.admin(identity);
+
+    if (!ROLES.includes(id as RoleName)) {
+      throw new NotFoundException('role not found');
+    }
+
+    return {
+      id,
+      name: id,
+      system: true,
+      mutable: false,
+    };
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+  update(_: string, __: unknown, identity: VerifiedIdentity) {
+    this.superAdmin(identity);
+    throw new ForbiddenException(
+      'system roles cannot be modified through this endpoint',
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+  remove(_: string, identity: VerifiedIdentity) {
+    this.superAdmin(identity);
+    throw new ForbiddenException(
+      'system roles cannot be removed through this endpoint',
+    );
+  }
+
+  private admin(identity: VerifiedIdentity) {
+    if (!['admin', 'super_admin'].includes(identity.role)) {
+      throw new ForbiddenException('administrator access required');
+    }
+  }
+
+  private superAdmin(identity: VerifiedIdentity) {
+    if (identity.role !== 'super_admin') {
+      throw new ForbiddenException('super administrator access required');
+    }
   }
 }
