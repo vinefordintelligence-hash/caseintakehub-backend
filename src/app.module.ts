@@ -63,6 +63,7 @@ import { ClientPortalAccessGateModule } from "./client-portal-access-gate/client
 import { ClientPortalAccessGateGuard } from "./client-portal-access-gate/client-portal-access-gate.guard";
 import { CaseAssignmentsModule } from "./case-assignments/case-assignments.module";
 import { WorkflowEngineModule } from "./workflow-engine/workflow-engine.module";
+import { FeeConfigurationModule } from "./fee-configuration/fee-configuration.module";
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -129,6 +130,7 @@ import { WorkflowEngineModule } from "./workflow-engine/workflow-engine.module";
     ClientPortalAccessGateModule,
     CaseAssignmentsModule,
     WorkflowEngineModule,
+    FeeConfigurationModule,
   ],
   controllers: [AppController],
   providers: [
