@@ -13,7 +13,11 @@ const identity = {
 
 describe('PaymentOperationsService', () => {
   it('requires administrator authority and never accepts a client assertion', async () => {
-    const service = new PaymentOperationsService({} as never, {} as never);
+    const service = new PaymentOperationsService(
+      {} as never,
+      {} as never,
+      {} as never,
+    );
     await expect(
       service.createRequirement({}, { ...identity, role: 'client' }),
     ).rejects.toBeInstanceOf(ForbiddenException);
@@ -49,6 +53,7 @@ describe('PaymentOperationsService', () => {
     const bound = new PaymentOperationsService(
       data as never,
       workflow as never,
+      {} as never,
     );
     await expect(
       bound.recordAuthoritativePayment('operation', paymentId, identity),

@@ -61,7 +61,8 @@ const socket = process.env.PAYMENT_OPERATIONS_TEST_SOCKET;
         ),
       );
       const workflow = { publish: jest.fn().mockResolvedValue(true) };
-      service = new PaymentOperationsService(db, workflow as never);
+      const feeConfig = {} as never;
+      service = new PaymentOperationsService(db, workflow as never, feeConfig);
     });
 
     beforeEach(async () => {

@@ -117,7 +117,8 @@ type OperationView = {
         [invoiceId, organizationId, caseId],
       );
       const workflow = { publish: jest.fn().mockResolvedValue(true) };
-      operations = new PaymentOperationsService(db, workflow as never);
+      const feeConfig = {} as never;
+      operations = new PaymentOperationsService(db, workflow as never, feeConfig);
       reconciliation = new PaymentReconciliationService(
         db,
         new WorkflowEngineService(db, new ActorService(db)),
